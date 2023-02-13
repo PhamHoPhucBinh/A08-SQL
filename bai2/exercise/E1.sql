@@ -14,8 +14,8 @@ CREATE TABLE NhaCungCap(
     MaNhaCungCap INT PRIMARY KEY not null,
     TenNhaCungCap VARCHAR(30),
     DiaChiNhaCungCap VARCHAR(50),
-    SdtNhaCungCap VARCHAR(15)
-   
+  
+    FOREIGN KEY (SoDatHang) REFERENCES DonDatHang(SoDatHang)
 );
 CREATE TABLE ChiTietPhieuXuat(
     SoLuongXuat INT,
@@ -39,3 +39,9 @@ CREATE TABLE ChiTietDonDatHang(
     FOREIGN KEY (MaVatTu) REFERENCES VatTu(MaVatTu),
     FOREIGN KEY (SoDatHang) REFERENCES DonDatHang(SoDatHang)
 );
+CREATE TABLE SoDienThoai(
+    idSDT Auto_Increments INT,
+    sdt VARCHAR(11),
+    MaNhaCungCap INT,
+    FOREIGN KEY (MaNhaCungCap) REFERENCES NhaCungCap(MaNhaCungCap)
+    );
