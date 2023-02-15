@@ -15,15 +15,17 @@ insert orderdetail (odQTY)
 values (3),(7),(2),(1),(8),(4),(3);
 
 select oID,oDate,oTotalPrice from `order` ;
-select customer.cName ,product.pName, `order`.cID,customer.cID  from customer,`order`,product;
-select * from customer c
-join `order` o on c.cid = o.cid;
+
+select customer.cID,customer.cName,product.pName as 'result' from customer
+inner join `order` on customer.cID = `order`.cID
+inner join orderdetail on `order`.oID = orderdetail.oID
+inner join product on orderdetail.pID = product.pID;
 
 select cID,cName 
 from customer
 where not exists ( select cID from `order` 
 where cID = customer.cID);
 
-
+select oID,oDate,odQTY,pPrice from product,`order`,
 
 
