@@ -40,7 +40,7 @@ CREATE TABLE ChiTietDonDatHang(
     FOREIGN KEY (SoDatHang) REFERENCES DonDatHang(SoDatHang)
 );
 CREATE TABLE SoDienThoai(
-    idSDT Auto_Increments INT,
+    idSDT  INT,
     sdt VARCHAR(11),
     MaNhaCungCap INT,
     FOREIGN KEY (MaNhaCungCap) REFERENCES NhaCungCap(MaNhaCungCap)
