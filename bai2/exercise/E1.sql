@@ -14,7 +14,7 @@ CREATE TABLE NhaCungCap(
     MaNhaCungCap INT PRIMARY KEY not null,
     TenNhaCungCap VARCHAR(30),
     DiaChiNhaCungCap VARCHAR(50),
-  
+	SDT int,
     FOREIGN KEY (SoDatHang) REFERENCES DonDatHang(SoDatHang)
 );
 CREATE TABLE ChiTietPhieuXuat(
@@ -43,5 +43,6 @@ CREATE TABLE SoDienThoai(
     idSDT  INT,
     sdt VARCHAR(11),
     MaNhaCungCap INT,
+    foreign key (sdt) references nhacungcap(SDT),
     FOREIGN KEY (MaNhaCungCap) REFERENCES NhaCungCap(MaNhaCungCap)
     );
