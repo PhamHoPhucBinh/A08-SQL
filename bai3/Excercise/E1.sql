@@ -7,4 +7,4 @@ set ClassID = '2'
 where ClassName = 'hung';
 select student.StudentName, subject.SubName , mark 
 from student,mark,subject 
-order by mark desc, StudentName
+order by mark desc, StudentName;
