@@ -78,7 +78,7 @@ group by month(hop_dong.ngay_lam_hop_dong);
 select hop_dong.ma_hop_dong, hop_dong.ngay_lam_hop_dong, hop_dong.ngay_ket_thuc,  hop_dong.tien_dat_coc, sum(hop_dong_chi_tiet.so_luong) as so_luong_dich_vu_di_kem
 from hop_dong
 left join hop_dong_chi_tiet on hop_dong.ma_hop_dong = hop_dong_chi_tiet.ma_hop_dong
-group by hop_dong.ma_hop_dong;
+group by hop_dong.ma_hop_dong ;
 -- câu 11 : Hiển thị thông tin các dịch vụ đi kèm đã được sử dụng bởi những khách hàng có ten_loai_khach là “Diamond” và có dia_chi ở “Vinh” hoặc “Quảng Ngãi”
 select dich_vu_di_kem.ten_dich_vu_di_kem , dich_vu_di_kem.ma_dich_vu_di_kem
 from dich_vu_di_kem
@@ -86,43 +86,48 @@ inner join hop_dong_chi_tiet on dich_vu_di_kem.ma_dich_vu_di_kem = hop_dong_chi_
 inner join hop_dong on hop_dong_chi_tiet.ma_hop_dong = hop_dong.ma_hop_dong
 inner join khach_hang on hop_dong.ma_khach_hang = khach_hang.ma_khach_hang
 inner join loai_khach on khach_hang.ma_loai_khach = loai_khach.ma_loai_khach
-where khach_hang.ma_khach_hang = 1 and khach_hang.dia_chi in ('%Quảng Ngãi%');
+where loai_khach.ten_loai_khach = 'Diamond' and (khach_hang.dia_chi  like '%Vinh%' or khach_hang.dia_chi like '%Quảng Ngãi%') ;
+
 -- câu 12 : đã từng đặt 1 trong time zone và loại trừ 1 timezone khác
-select hop_dong.ma_hop_dong, nhan_vien.ho_ten , khach_hang.ho_ten, khach_hang.so_dien_thoai, dich_vu.ten_dich_vu , hop_dong.tien_dat_coc,
-sum(hop_dong_chi_tiet.so_luong) as so_luong_dich_vu_di_kem
-from hop_dong 
-inner join nhan_vien on hop_dong.ma_nhan_vien = nhan_vien.ma_nhan_vien
-inner join khach_hang on hop_dong.ma_khach_hang = khach_hang.ma_khach_hang
-inner join dich_vu on hop_dong.ma_dich_vu = dich_vu.ma_dich_vu
-inner join hop_dong_chi_tiet on hop_dong.ma_hop_dong = hop_dong_chi_tiet.ma_hop_dong
-inner join dich_vu_di_kem on hop_dong_chi_tiet.ma_dich_vu_di_kem = dich_vu_di_kem.ma_dich_vu_di_kem
-where year(hop_dong.ngay_lam_hop_dong) = 2020 and month(hop_dong.ngay_lam_hop_dong) in (10,11,12)
-and hop_dong.ma_hop_dong not in (
-select hop_dong.ngay_lam_hop_dong
-from hop_dong 
-where year(hop_dong.ngay_lam_hop_dong) = 2021 and month(hop_dong.ngay_lam_hop_dong) in (1,2,3)
+SELECT hop_dong.ma_hop_dong, nhan_vien.ho_ten, khach_hang.ho_ten, khach_hang.so_dien_thoai, dich_vu.ten_dich_vu, hop_dong.tien_dat_coc,
+SUM(hop_dong_chi_tiet.so_luong) AS so_luong_dich_vu_di_kem
+FROM hop_dong 
+INNER JOIN nhan_vien ON hop_dong.ma_nhan_vien = nhan_vien.ma_nhan_vien
+INNER JOIN khach_hang ON hop_dong.ma_khach_hang = khach_hang.ma_khach_hang
+INNER JOIN dich_vu ON hop_dong.ma_dich_vu = dich_vu.ma_dich_vu
+INNER JOIN hop_dong_chi_tiet ON hop_dong.ma_hop_dong = hop_dong_chi_tiet.ma_hop_dong
+INNER JOIN dich_vu_di_kem ON hop_dong_chi_tiet.ma_dich_vu_di_kem = dich_vu_di_kem.ma_dich_vu_di_kem
+WHERE YEAR(hop_dong.ngay_lam_hop_dong) = 2020 AND MONTH(hop_dong.ngay_lam_hop_dong) IN (10,11,12)
+AND hop_dong.ma_hop_dong NOT IN (
+    SELECT hop_dong.ma_hop_dong
+    FROM hop_dong 
+    WHERE YEAR(hop_dong.ngay_lam_hop_dong) = 2021 AND MONTH(hop_dong.ngay_lam_hop_dong) IN (1,2,3)
 )
-group by hop_dong.ma_hop_dong, nhan_vien.ho_ten , khach_hang.ho_ten, khach_hang.so_dien_thoai, dich_vu.ten_dich_vu , hop_dong.tien_dat_coc,so_luong_dich_vu_di_kem;
+GROUP BY hop_dong.ma_hop_dong, nhan_vien.ho_ten, khach_hang.ho_ten, khach_hang.so_dien_thoai, dich_vu.ten_dich_vu, hop_dong.tien_dat_coc;
+
 
 -- câu 13 : đếm số dvdk và filter ra số lớn nhất
-select dich_vu_di_kem.ten_dich_vu_di_kem , count(*) as so_lan_su_dung
+select s.ten_dich_vu_di_kem,  max(s.sum_so_luong) as max_soluong
+from (
+select dich_vu_di_kem.ten_dich_vu_di_kem as ten_dich_vu_di_kem, sum(hop_dong_chi_tiet.so_luong) as sum_so_luong
 from dich_vu_di_kem
 join hop_dong_chi_tiet on dich_vu_di_kem.ma_dich_vu_di_kem = hop_dong_chi_tiet.ma_dich_vu_di_kem
 join hop_dong on hop_dong_chi_tiet.ma_hop_dong = hop_dong.ma_hop_dong
 join khach_hang on hop_dong.ma_khach_hang = khach_hang.ma_khach_hang
-group by dich_vu_di_kem.ten_dich_vu_di_kem 
-order by so_lan_su_dung;
+group by  dich_vu_di_kem.ma_dich_vu_di_kem) s ;
 
--- câu 14 :
-select hop_dong_chi_tiet.ma_dich_vu_di_kem ,count(hop_dong_chi_tiet.ma_dich_vu_di_kem) as num_used , 
-hop_dong.ma_hop_dong , loai_dich_vu.ten_loai_dich_vu , dich_vu_di_kem.ten_dich_vu_di_kem
-from hop_dong
-inner join hop_dong_chi_tiet on hop_dong.ma_hop_dong = hop_dong_chi_tiet.ma_hop_dong
-inner join dich_vu_di_kem on hop_dong_chi_tiet.ma_dich_vu_di_kem = dich_vu_di_kem.ma_dich_vu_di_kem
-inner join dich_vu on hop_dong.ma_dich_vu = dich_vu.ma_dich_vu
-inner join loai_dich_vu on dich_vu.ma_loai_dich_vu = loai_dich_vu.ma_loai_dich_vu
-group by hop_dong.ma_hop_dong , loai_dich_vu.ten_loai_dich_vu , dich_vu_di_kem.ten_dich_vu_di_kem, num_used
-having count(hop_dong_chi_tiet.ma_dich_vu_di_kem);
+
+-- câu 14 :Hiển thị thông tin tất cả các Dịch vụ đi kèm chỉ mới được sử dụng một lần duy nhất.
+-- Thông tin hiển thị bao gồm ma_hop_dong, ten_loai_dich_vu, ten_dich_vu_di_kem, so_lan_su_dung (được tính dựa trên việc count các ma_dich_vu_di_kem).
+SELECT hop_dong.ma_hop_dong, loai_dich_vu.ten_loai_dich_vu, dich_vu_di_kem.ten_dich_vu_di_kem,
+COUNT(hop_dong_chi_tiet.ma_dich_vu_di_kem) as num_used
+FROM hop_dong
+inner join dich_vu on dich_vu.ma_dich_vu = hop_dong.ma_dich_vu
+inner join loai_dich_vu on loai_dich_vu.ma_loai_dich_vu = dich_vu.ma_loai_dich_vu
+inner join hop_dong_chi_tiet on hop_dong_chi_tiet.ma_hop_dong  = hop_dong.ma_hop_dong
+inner join dich_vu_di_kem on dich_vu_di_kem.ma_dich_vu_di_kem = hop_dong_chi_tiet.ma_dich_vu_di_kem
+GROUP BY dich_vu_di_kem.ten_dich_vu_di_kem
+HAVING num_used = 1;
 
 -- câu 15 : hàm tối đa bao nhiêu lần record
 select nhan_vien.ma_nhan_vien, nhan_vien.ho_ten, trinh_do.ten_trinh_do , bo_phan.ten_bo_phan, nhan_vien.so_dien_thoai, nhan_vien.dia_chi
