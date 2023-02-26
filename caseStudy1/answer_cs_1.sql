@@ -152,3 +152,43 @@ WHERE hdg.ngay_lam_hop_dong BETWEEN '2021-01-01' AND '2021-12-31'
 GROUP BY hd.ma_khach_hang
 HAVING SUM(hd.tong_tien) > 10000000
 ) AND ma_loai_khach = '2';
+
+-- câu 18 :  xóa theo condition thời gian
+delete from khach_hang
+where ma_khach_hang in (
+select distinct ma_khach_hang
+from hop_dong
+where year(ngay_lam_hop_dong) < 2021);
+
+DELETE FROM khach_hang 
+WHERE ma_khach_hang IN (
+    SELECT DISTINCT ma_khach_hang 
+    FROM hop_dong 
+    WHERE YEAR(ngay_lam_hop_dong) < 2021
+);
+
+
+-- câu 19 : Cập nhật giá cho các dịch vụ đi kèm được sử dụng trên 10 lần trong năm 2020 lên gấp đôi.
+UPDATE dich_vu_di_kem
+SET gia = gia * 2
+WHERE ma_dich_vu_di_kem IN (
+    SELECT ma_dich_vu_di_kem
+    FROM hop_dong_chi_tiet
+    INNER JOIN hop_dong ON hop_dong.ma_hop_dong = hop_dong_chi_tiet.ma_hop_dong
+    WHERE YEAR(ngay_lam_hop_dong) = 2020
+    GROUP BY ma_dich_vu_di_kem
+    HAVING COUNT(*) > 10
+);
+
+-- câu 20 : Hiển thị thông tin của tất cả các nhân viên và khách hàng có trong hệ thống, 
+-- thông tin hiển thị bao gồm id (ma_nhan_vien, ma_khach_hang), ho_ten, email, so_dien_thoai, ngay_sinh
+
+SELECT ma_nhan_vien AS id, ho_ten, email, so_dien_thoai, ngay_sinh
+FROM nhan_vien
+
+UNION ALL
+
+SELECT ma_khach_hang AS id, ho_ten, email, so_dien_thoai, ngay_sinh
+FROM khach_hang;
+
+
